@@ -7,11 +7,18 @@ import { AsyncPipe } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { StreamSourceLoginArgs } from './soundboard.model';
 import { StreamSourceService } from './stream-source.service';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { heroExclamationTriangle } from '@ng-icons/heroicons/outline';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AsyncPipe],
+  imports: [RouterOutlet, AsyncPipe, NgIconComponent],
+  providers: [
+    provideIcons({
+      heroExclamationTriangle
+    })
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [
@@ -54,6 +61,9 @@ export class AppComponent implements OnInit {
 
   public readonly statusVisible$ = this.queryParams$.pipe(
     map(params => params.has('status')),
+  );
+  public readonly warningVisible$ = this.soundboardService.connected.pipe(
+    map(connected => !connected),
   );
 
   private readonly soundCommandCache = new Map<string, SafeUrl>();

@@ -4,4 +4,10 @@
   </p>
 }
 
+@if (warningVisible$ | async) {
+  <span class="warning">
+    <ng-icon name="heroExclamationTriangle"></ng-icon>
+  </span>
+}
+
 <audio #audio [src]="audioSource" autoplay></audio>
