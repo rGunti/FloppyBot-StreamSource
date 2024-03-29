@@ -9,6 +9,11 @@ jobs:
   publish:
     name: Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: 
+          - amd64
+          - arm64
     steps:
       # Setup Environment
       - name: Set up QEMU
@@ -44,7 +49,7 @@ jobs:
           context: '.'
           file: Dockerfile
           push: true
-          platforms: linux/amd64
+          platforms: linux/${{ matrix.arch }}
           tags: floppybot/stream-source:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -54,8 +59,18 @@ jobs:
           context: '.'
           file: Dockerfile
           push: true
-          platforms: linux/amd64
+          platforms: linux/${{ matrix.arch }}
           tags: floppybot/stream-source:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build and push (arch ${{ matrix.arch }})
+        uses: docker/build-push-action@v3
+        with:
+          context: '.'
+          file: Dockerfile
+          push: true
+          platforms: linux/${{ matrix.arch }}
+          tags: floppybot/stream-source:${{ matrix.arch }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Build and push (release)
@@ -64,7 +79,7 @@ jobs:
           context: '.'
           file: Dockerfile
           push: true
-          platforms: linux/amd64
+          platforms: linux/${{ matrix.arch }}
           tags: floppybot/stream-source:release
           cache-from: type=gha
           cache-to: type=gha,mode=max
