@@ -52,6 +52,10 @@ export class AppComponent implements OnInit {
     })),
   );
 
+  public readonly statusVisible$ = this.queryParams$.pipe(
+    map(params => params.has('status')),
+  );
+
   private readonly soundCommandCache = new Map<string, SafeUrl>();
 
   status$ = this.soundboardService.status.pipe(startWith('Connecting ...'), map(status => `${new Date().toISOString()} - ${status}`));

@@ -1,5 +1,7 @@
-<p [@inOutAnimation]>
-  {{ status$ | async }}
-</p>
+@if (statusVisible$ | async) {
+  <p [@inOutAnimation]>
+    {{ status$ | async }}
+  </p>
+}
 
-<audio #audio [src]="audioSource" autoplay controls></audio>
+<audio #audio [src]="audioSource" autoplay></audio>
