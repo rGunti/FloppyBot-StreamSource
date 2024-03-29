@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { environment } from '../environments/environment';
 import { SoundCommandInvocation, StreamSourceLoginArgs } from './soundboard.model';
-import { Observable, Subject, from, of, switchMap } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,9 @@ import { Observable, Subject, from, of, switchMap } from 'rxjs';
 export class SoundboardService {
   private readonly hub = new HubConnectionBuilder()
     .withUrl(`${environment.endpoint}/hub/stream-source`)
-    .withAutomaticReconnect()
+    .withAutomaticReconnect({
+      nextRetryDelayInMilliseconds: () => 5000
+    })
     .build();
 
   private readonly statusSubject = new Subject<string>();
