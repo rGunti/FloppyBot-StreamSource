@@ -5,6 +5,6 @@ COPY ["nginx.conf", "/etc/nginx/conf.d/default.conf"]
 
 FROM base AS publish
 WORKDIR /usr/share/nginx/html
-COPY ./dist/floppybot-soundboard/ .
+COPY ./dist/floppybot-soundboard/browser/ .
 #CMD ["sh", "/startup.sh"]
 EXPOSE 80
