@@ -1,3 +1,3 @@
 export const environment = {
-    endpoint: 'http://localhost:5266'
+    endpoint: 'https://api.v2-bot.floppypanda.ch'
 };

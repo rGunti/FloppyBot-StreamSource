@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { SafeUrl } from '@angular/platform-browser';
-import { Router, RouterOutlet } from '@angular/router';
-import { Observable, filter, map, startWith, switchMap } from 'rxjs';
+import { ParamMap, Router, RouterOutlet } from '@angular/router';
+import { Observable, combineLatest, filter, map, startWith, switchMap, tap } from 'rxjs';
 import { SoundboardService } from './soundboard.service';
 import { AsyncPipe } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
@@ -9,6 +9,13 @@ import { StreamSourceLoginArgs } from './soundboard.model';
 import { StreamSourceService } from './stream-source.service';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroExclamationTriangle } from '@ng-icons/heroicons/outline';
+import { Logger } from './utils/log';
+
+const LOG = Logger.create('AppComponent');
+
+function hasAllRequiredParams(params: ParamMap): boolean {
+  return params.has('channel') && params.has('token');
+}
 
 @Component({
   selector: 'app-root',
@@ -52,18 +59,26 @@ export class AppComponent implements OnInit {
 
   private readonly queryParams$ = this.router.routerState.root.queryParamMap;
   private readonly channelAndToken$: Observable<StreamSourceLoginArgs> = this.queryParams$.pipe(
-    filter(params => params.has('channel') && params.has('token')),
+    tap(params => {
+      if (!hasAllRequiredParams(params)) {
+        LOG.error('You are missing some query parameters. Please provide `channel` and `token`.');
+      }
+    }),
+    filter(params => hasAllRequiredParams(params)),
     map(params => ({
       channel: params.get('channel')!,
       token: params.get('token')!,
     })),
   );
 
+  public readonly hasRequiredQueryParams$ = this.queryParams$.pipe(
+    map(hasAllRequiredParams),
+  );
   public readonly statusVisible$ = this.queryParams$.pipe(
     map(params => params.has('status')),
   );
-  public readonly warningVisible$ = this.soundboardService.connected.pipe(
-    map(connected => !connected),
+  public readonly warningVisible$ = combineLatest([this.soundboardService.connected, this.hasRequiredQueryParams$]).pipe(
+    map(([connected, hasRequiredQueryParams]) => !connected || !hasRequiredQueryParams),
   );
 
   private readonly soundCommandCache = new Map<string, SafeUrl>();
@@ -76,10 +91,13 @@ export class AppComponent implements OnInit {
   @ViewChild('audio') audioRef: ElementRef<HTMLAudioElement> = null!;
 
   ngOnInit(): void {
+    LOG.onInit();
+
     this.soundboardService.connected.pipe(
       filter(connected => connected),
       switchMap(() => this.channelAndToken$),
     ).subscribe((loginArgs) => {
+      LOG.info('Connected, logging in now ...', loginArgs);
       this.soundboardService.login(loginArgs);
     });
 
@@ -87,6 +105,7 @@ export class AppComponent implements OnInit {
       switchMap((invocation) => this.channelAndToken$.pipe(
         map((loginArgs) => loginArgs.token),
         map((token) => {
+          LOG.info('Received sound command ...');
           if (this.soundCommandCache.has(invocation.commandName)) {
             return this.soundCommandCache.get(invocation.commandName)!;
           }
@@ -100,6 +119,7 @@ export class AppComponent implements OnInit {
   }
 
   private playSound(source: SafeUrl): void {
+    LOG.info('Playing sound', source);
     this.audioSource = source;
     this.audioRef.nativeElement.play();
   }

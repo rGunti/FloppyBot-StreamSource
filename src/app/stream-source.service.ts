@@ -4,6 +4,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { SoundCommandAbstract } from './stream-source.model';
 import { SafeUrl } from '@angular/platform-browser';
+import { Logger } from './utils/log';
+
+const LOG = Logger.create('StreamSourceService');
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +16,17 @@ export class StreamSourceService {
 
   constructor(
     private readonly http: HttpClient
-  ) { }
+  ) {
+    LOG.ctor();
+  }
 
   getSoundCommands(channel: string): Observable<SoundCommandAbstract[]> {
+    LOG.debug('getSoundCommands', channel);
     return this.http.get<SoundCommandAbstract[]>(`${this.apiServerUrl}/${channel}/sound-commands`);
   }
 
   getFile(channel: string, fileName: string, apiKey: string): Observable<Blob> {
+    LOG.debug('getFile', channel, fileName);
     return this.http.get(`${this.apiServerUrl}/${channel}/file`, {
       headers: {
         'X-Api-Key': apiKey,

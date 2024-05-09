@@ -4,6 +4,10 @@
   </p>
 }
 
+@if ((hasRequiredQueryParams$ | async) === false) {
+  <p>&#9888;&#65039; Your URL doesn't seem correct.</p>
+}
+
 @if (warningVisible$ | async) {
   <span class="warning">
     <ng-icon name="heroExclamationTriangle"></ng-icon>
