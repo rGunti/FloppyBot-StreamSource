@@ -66,7 +66,8 @@ export class SoundboardService {
       await this.hub.invoke('Login', loginArgs);
       this.statusSubject.next('Login successful, ready to take commands');
     } catch (err) {
-      this.statusSubject.next(`Login failed: ${(err as any).message}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.statusSubject.next(`Login failed: ${(err as unknown as any).message}`);
     }
   }
 }
