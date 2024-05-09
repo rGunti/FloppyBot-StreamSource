@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ matrix.pnpm-version }}
           run_install: false
@@ -100,7 +100,7 @@ jobs:
 #        with:
 #          node-version: ${{ matrix.node-version }}
 #      - name: Setup pnpm V${{ matrix.pnpm-version }}
-#        uses: pnpm/action-setup@v3
+#        uses: pnpm/action-setup@v4
 #        with:
 #          version: ${{ matrix.pnpm-version }}
 #          run_install: false
