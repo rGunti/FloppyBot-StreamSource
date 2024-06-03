@@ -33,11 +33,11 @@ dependencies:
     specifier: ^7.0.14
     version: 7.0.14
   '@ng-icons/core':
-    specifier: ^27.2.0
-    version: 27.4.0
+    specifier: ^27.5.2
+    version: 27.5.2
   '@ng-icons/heroicons':
-    specifier: ^27.2.0
-    version: 27.4.0
+    specifier: ^27.5.2
+    version: 27.5.2
   rxjs:
     specifier: ~7.8.0
     version: 7.8.1
@@ -2447,14 +2447,14 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ng-icons/core@27.4.0:
-    resolution: {integrity: sha512-M4Hz4JI2owd8brMTrwrQYJhVjHgGN768bSnhwucAka3mk7HQKeR/zp5ONq5AxPGnAk4UU2xwYhN1DGnETtAnIg==}
+  /@ng-icons/core@27.5.2:
+    resolution: {integrity: sha512-LDfhrfxJ5yM8NkpSlz9ix+RRuecFHZYjfCgXH0dVDuk5gx+40Dxi/v9vL8oRpUP4oL9spR7Ndry2ENVZY/h4Tw==}
     dependencies:
       tslib: 2.6.2
     dev: false
 
-  /@ng-icons/heroicons@27.4.0:
-    resolution: {integrity: sha512-Wln/XLxFkmrJ28ppFqtziUMPP3poVisSs3L/QtuKf/bgx1qK+Rg1qndQkEuj48JVy+qwqIIVLwmAETWT+L0uXA==}
+  /@ng-icons/heroicons@27.5.2:
+    resolution: {integrity: sha512-+OaXaZb+E6yQrfiqME92OMstUH+1tv9GvPr7IY6Bnxdm+db633gs/8Vz3O+lMq6/luqSY87nwglwLWhoR4Nm4A==}
     dependencies:
       tslib: 2.6.2
     dev: false
