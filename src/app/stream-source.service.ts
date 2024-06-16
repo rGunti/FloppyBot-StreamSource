@@ -12,7 +12,7 @@ const LOG = Logger.create('StreamSourceService');
   providedIn: 'root'
 })
 export class StreamSourceService {
-  private readonly apiServerUrl = `${environment.endpoint}/api/v1/stream-source`;
+  private readonly apiServerUrl = `${environment.endpoint}/api/v2/stream-source`;
 
   constructor(
     private readonly http: HttpClient
