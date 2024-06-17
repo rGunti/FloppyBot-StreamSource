@@ -16,7 +16,7 @@ dependencies:
     version: 17.3.11(@angular/core@17.3.11)
   '@angular/core':
     specifier: ^17.3.11
-    version: 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+    version: 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
   '@angular/forms':
     specifier: ^17.3.11
     version: 17.3.11(@angular/common@17.3.11)(@angular/core@17.3.11)(@angular/platform-browser@17.3.11)(rxjs@7.8.1)
@@ -45,8 +45,8 @@ dependencies:
     specifier: ^2.3.0
     version: 2.6.2
   zone.js:
-    specifier: ~0.14.6
-    version: 0.14.6
+    specifier: ~0.14.7
+    version: 0.14.7
 
 devDependencies:
   '@angular-devkit/build-angular':
@@ -426,7 +426,7 @@ packages:
     peerDependencies:
       '@angular/core': 17.3.11
     dependencies:
-      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
       tslib: 2.6.2
     dev: false
 
@@ -466,7 +466,7 @@ packages:
       '@angular/core': 17.3.11
       rxjs: ^6.5.3 || ^7.4.0
     dependencies:
-      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
       rxjs: 7.8.1
       tslib: 2.6.2
     dev: false
@@ -502,10 +502,10 @@ packages:
       '@angular/core':
         optional: true
     dependencies:
-      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
       tslib: 2.6.2
 
-  /@angular/core@17.3.11(rxjs@7.8.1)(zone.js@0.14.6):
+  /@angular/core@17.3.11(rxjs@7.8.1)(zone.js@0.14.7):
     resolution: {integrity: sha512-2wPZwXFei3kVxK2ylIH6CdGebrC4kvooFx7qoX+250OITAEFMODJGdh/e3x0DpFUjlRvQtIFQ+YpQlfC5JnL4g==}
     engines: {node: ^18.13.0 || >=20.9.0}
     peerDependencies:
@@ -514,7 +514,7 @@ packages:
     dependencies:
       rxjs: 7.8.1
       tslib: 2.6.2
-      zone.js: 0.14.6
+      zone.js: 0.14.7
 
   /@angular/forms@17.3.11(@angular/common@17.3.11)(@angular/core@17.3.11)(@angular/platform-browser@17.3.11)(rxjs@7.8.1):
     resolution: {integrity: sha512-719flo/1L64YOAxL3pzszTK+7bczVVOQDXT1khnjb48GVZdBUBwW2D+cFbqSW1VMuWWr2Amwy1lL4YM5S7qPJQ==}
@@ -526,7 +526,7 @@ packages:
       rxjs: ^6.5.3 || ^7.4.0
     dependencies:
       '@angular/common': 17.3.11(@angular/core@17.3.11)(rxjs@7.8.1)
-      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
       '@angular/platform-browser': 17.3.11(@angular/animations@17.3.11)(@angular/common@17.3.11)(@angular/core@17.3.11)
       rxjs: 7.8.1
       tslib: 2.6.2
@@ -543,7 +543,7 @@ packages:
     dependencies:
       '@angular/common': 17.3.11(@angular/core@17.3.11)(rxjs@7.8.1)
       '@angular/compiler': 17.3.11(@angular/core@17.3.11)
-      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
       '@angular/platform-browser': 17.3.11(@angular/animations@17.3.11)(@angular/common@17.3.11)(@angular/core@17.3.11)
       tslib: 2.6.2
     dev: false
@@ -561,7 +561,7 @@ packages:
     dependencies:
       '@angular/animations': 17.3.11(@angular/core@17.3.11)
       '@angular/common': 17.3.11(@angular/core@17.3.11)(rxjs@7.8.1)
-      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
       tslib: 2.6.2
     dev: false
 
@@ -575,7 +575,7 @@ packages:
       rxjs: ^6.5.3 || ^7.4.0
     dependencies:
       '@angular/common': 17.3.11(@angular/core@17.3.11)(rxjs@7.8.1)
-      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.6)
+      '@angular/core': 17.3.11(rxjs@7.8.1)(zone.js@0.14.7)
       '@angular/platform-browser': 17.3.11(@angular/animations@17.3.11)(@angular/common@17.3.11)(@angular/core@17.3.11)
       rxjs: 7.8.1
       tslib: 2.6.2
@@ -8991,5 +8991,5 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /zone.js@0.14.6:
-    resolution: {integrity: sha512-vyRNFqofdaHVdWAy7v3Bzmn84a1JHWSjpuTZROT/uYn8I3p2cmo7Ro9twFmYRQDPhiYOV7QLk0hhY4JJQVqS6Q==}
+  /zone.js@0.14.7:
+    resolution: {integrity: sha512-0w6DGkX2BPuiK/NLf+4A8FLE43QwBfuqz2dVgi/40Rj1WmqUskCqj329O/pwrqFJLG5X8wkeG2RhIAro441xtg==}
