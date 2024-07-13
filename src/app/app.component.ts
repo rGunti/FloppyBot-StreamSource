@@ -1,11 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { SafeUrl } from '@angular/platform-browser';
 import { ParamMap, Router, RouterOutlet } from '@angular/router';
-import { Observable, combineLatest, filter, map, startWith, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, combineLatest, filter, map, startWith, switchMap, tap } from 'rxjs';
 import { SoundboardService } from './soundboard.service';
 import { AsyncPipe } from '@angular/common';
-import { animate, style, transition, trigger } from '@angular/animations';
-import { StreamSourceLoginArgs } from './soundboard.model';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { PayloadType, SoundCommandInvocation, StreamSourceLoginArgs } from './soundboard.model';
 import { StreamSourceService } from './stream-source.service';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroExclamationTriangle } from '@ng-icons/heroicons/outline';
@@ -49,7 +49,13 @@ function hasAllRequiredParams(params: ParamMap): boolean {
           ]
         )
       ]
-    )
+    ),
+    trigger('visualAlert', [
+      state('false', style({ opacity: 0 })),
+      state('true', style({ opacity: 1 })),
+      transition('false => true', animate('1000ms ease-in')),
+      transition('true => false', animate('1000ms ease-out'))
+    ])
   ]
 })
 export class AppComponent implements OnInit {
@@ -70,6 +76,7 @@ export class AppComponent implements OnInit {
       token: params.get('token')!,
     })),
   );
+  private readonly showVisualAlert$ = new BehaviorSubject<boolean>(false);
 
   public readonly hasRequiredQueryParams$ = this.queryParams$.pipe(
     map(hasAllRequiredParams),
@@ -79,6 +86,18 @@ export class AppComponent implements OnInit {
   );
   public readonly warningVisible$ = combineLatest([this.soundboardService.connected, this.hasRequiredQueryParams$]).pipe(
     map(([connected, hasRequiredQueryParams]) => !connected || !hasRequiredQueryParams),
+  );
+
+  public readonly visualAlert$ = this.soundboardService.soundCommandReceived.pipe(
+    filter(invocation => invocation.type === PayloadType.Visual),
+    tap((invocation) => {
+      LOG.info('Visual alert invoked:', invocation);
+      this.showVisualAlert$.next(true);
+      setTimeout(() => this.showVisualAlert$.next(false), 5_000);
+    })
+  );
+  public readonly visualAlertVisible$ = this.showVisualAlert$.asObservable().pipe(
+    tap((show) => LOG.info('Visual alert visible:', show)),
   );
 
   private readonly soundCommandCache = new Map<string, SafeUrl>();
@@ -102,6 +121,7 @@ export class AppComponent implements OnInit {
     });
 
     this.soundboardService.soundCommandReceived.pipe(
+      filter(invocation => invocation.type === PayloadType.Sound),
       switchMap((invocation) => this.channelAndToken$.pipe(
         map((loginArgs) => loginArgs.token),
         map((token) => {
@@ -122,5 +142,9 @@ export class AppComponent implements OnInit {
     LOG.info('Playing sound', source);
     this.audioSource = source;
     this.audioRef.nativeElement.play();
+  }
+
+  private showVisualAlert(invocation: SoundCommandInvocation): void {
+    LOG.info('Showing visual alert', invocation);
   }
 }
