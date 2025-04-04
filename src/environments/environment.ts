@@ -1,5 +1,4 @@
 import { AppEnvironment } from "./environment.interface";
 
-export const environment: AppEnvironment = {
-    endpoint: 'https://api.v2-bot.floppypanda.ch'
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const environment: AppEnvironment = (window as any)['env'] as AppEnvironment;
