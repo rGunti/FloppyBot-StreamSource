@@ -1,5 +1,5 @@
 (function () {
   window['env'] = {
-    production: true,
+    endpoint: '${FLPY_API_HOST}',
   };
 })();
