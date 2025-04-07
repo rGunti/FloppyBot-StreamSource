@@ -28,6 +28,6 @@ FloppyBot Stream Source is distributed as a Docker image under the tag `floppybo
 [floppybot]: https://github.com/rgunti/floppybot
 [floppybot-ac]: https://github.com/rGunti/FloppyBot-AdminConsole
 [floppybot-ss]: https://github.com/rGunti/FloppyBot-StreamSource
-[img-floppybot]: https://img.shields.io/badge/FloppyBot-gray?logo=.net
-[img-floppybot-ac]: https://img.shields.io/badge/Admin_Console-gray?logo=googlechrome
-[img-floppybot-ss]: https://img.shields.io/badge/Stream_Source-blue?logo=obsstudio
+[img-floppybot]: https://img.shields.io/badge/FloppyBot-gray?logo=.net&logoColor=white
+[img-floppybot-ac]: https://img.shields.io/badge/Admin_Console-gray?logo=googlechrome&logoColor=white
+[img-floppybot-ss]: https://img.shields.io/badge/Stream_Source-blue?logo=obsstudio&logoColor=white
