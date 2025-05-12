@@ -121,8 +121,8 @@ importers:
         specifier: ^3.5.3
         version: 3.5.3
       prettier-eslint:
-        specifier: ^16.4.1
-        version: 16.4.1(typescript@5.4.5)
+        specifier: ^16.4.2
+        version: 16.4.2(typescript@5.4.5)
       typescript:
         specifier: ~5.4.2
         version: 5.4.5
@@ -3759,8 +3759,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-eslint@16.4.1:
-    resolution: {integrity: sha512-qf8Grhq68kg0tyhXVik2aOx72W8Jxre2ABXgV1pC3OCb3jOo40UZuvk3f/I3/ZA7Qw6qydZX4b7ySSCSgv4/8A==}
+  prettier-eslint@16.4.2:
+    resolution: {integrity: sha512-vtJAQEkaN8fW5QKl08t7A5KCjlZuDUNeIlr9hgolMS5s3+uzbfRHDwaRnzrdqnY2YpHDmeDS/8zY0MKQHXJtaA==}
     engines: {node: '>=16.10.0'}
     peerDependencies:
       prettier-plugin-svelte: ^3.0.0
@@ -4050,6 +4050,11 @@ packages:
 
   semver@7.7.1:
     resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
+  semver@7.7.2:
+    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -5796,7 +5801,7 @@ snapshots:
       '@babel/helper-split-export-declaration': 7.24.7
       '@babel/parser': 7.27.1
       '@babel/types': 7.27.1
-      debug: 4.4.0
+      debug: 4.3.6
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -6107,7 +6112,7 @@ snapshots:
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
 
   '@npmcli/git@5.0.8':
     dependencies:
@@ -6118,7 +6123,7 @@ snapshots:
       proc-log: 4.2.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.7.1
+      semver: 7.6.0
       which: 4.0.0
     transitivePeerDependencies:
       - bluebird
@@ -6138,7 +6143,7 @@ snapshots:
       json-parse-even-better-errors: 3.0.2
       normalize-package-data: 6.0.2
       proc-log: 4.2.0
-      semver: 7.7.1
+      semver: 7.7.2
     transitivePeerDependencies:
       - bluebird
 
@@ -6478,7 +6483,7 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.3
-      semver: 7.7.1
+      semver: 7.7.2
       ts-api-utils: 1.4.3(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
@@ -6493,7 +6498,7 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.7.1
+      semver: 7.7.2
       ts-api-utils: 1.3.0(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
@@ -7283,7 +7288,7 @@ snapshots:
       base64id: 2.0.0
       cookie: 0.4.2
       cors: 2.8.5
-      debug: 4.3.7
+      debug: 4.3.6
       engine.io-parser: 5.2.2
       ws: 8.11.0
     transitivePeerDependencies:
@@ -8307,7 +8312,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
 
   make-fetch-happen@13.0.1:
     dependencies:
@@ -8493,7 +8498,7 @@ snapshots:
       make-fetch-happen: 13.0.1
       nopt: 7.2.1
       proc-log: 4.2.0
-      semver: 7.7.1
+      semver: 7.7.2
       tar: 6.2.1
       which: 4.0.0
     transitivePeerDependencies:
@@ -8508,7 +8513,7 @@ snapshots:
   normalize-package-data@6.0.2:
     dependencies:
       hosted-git-info: 7.0.2
-      semver: 7.7.1
+      semver: 7.7.2
       validate-npm-package-license: 3.0.4
 
   normalize-path@3.0.0: {}
@@ -8813,7 +8818,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-eslint@16.4.1(typescript@5.4.5):
+  prettier-eslint@16.4.2(typescript@5.4.5):
     dependencies:
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.4.5)
       common-tags: 1.8.2
@@ -8825,6 +8830,7 @@ snapshots:
       prettier: 3.5.3
       pretty-format: 29.7.0
       require-relative: 0.8.7
+      tslib: 2.8.1
       vue-eslint-parser: 9.4.3(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
@@ -9099,6 +9105,8 @@ snapshots:
 
   semver@7.7.1: {}
 
+  semver@7.7.2: {}
+
   send@0.19.0:
     dependencies:
       debug: 2.6.9
@@ -9229,7 +9237,7 @@ snapshots:
 
   socket.io-adapter@2.5.4:
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.6
       ws: 8.11.0
     transitivePeerDependencies:
       - bufferutil
@@ -9239,7 +9247,7 @@ snapshots:
   socket.io-parser@4.2.4:
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.7
+      debug: 4.3.6
     transitivePeerDependencies:
       - supports-color
 
@@ -9343,7 +9351,7 @@ snapshots:
   streamroller@3.1.5:
     dependencies:
       date-format: 4.0.14
-      debug: 4.4.0
+      debug: 4.3.6
       fs-extra: 8.1.0
     transitivePeerDependencies:
       - supports-color
@@ -9599,7 +9607,7 @@ snapshots:
       espree: 9.6.1
       esquery: 1.6.0
       lodash: 4.17.21
-      semver: 7.7.1
+      semver: 7.7.2
     transitivePeerDependencies:
       - supports-color
 

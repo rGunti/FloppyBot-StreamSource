@@ -54,7 +54,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "npm-run-all2": "^6.2.6",
     "prettier": "^3.5.3",
-    "prettier-eslint": "^16.4.1",
+    "prettier-eslint": "^16.4.2",
     "typescript": "~5.4.2"
   },
   "pnpm": {
