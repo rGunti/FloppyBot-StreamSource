@@ -20,7 +20,7 @@ jobs:
 
     steps:
       # Checkout the repository
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       # Setup Node.js and pnpm
       - name: Node ${{ matrix.node-version }}
@@ -92,7 +92,7 @@ jobs:
 #          #- canary
 #    steps:
 #      # Checkout the repository
-#      - uses: actions/checkout@v5
+#      - uses: actions/checkout@v6
 #
 #      # Setup Node.js and pnpm
 #      - name: Setup Node V${{ matrix.node-version }}
