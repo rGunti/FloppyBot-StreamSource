@@ -17,7 +17,11 @@
 <p [@visualAlert]="visualAlertVisible$ | async">
   @if (visualAlert$ | async; as alert) {
     <!-- <i>{{ alert.invokedAt }}</i> -->
-    <span class="alert-text">{{ alert.payloadToPlay }}</span>
+    @if (alert.payloadBlobUrl) {
+      <img class="alert-image" [src]="alert.payloadBlobUrl" alt="Visual Alert Image" />
+    } @else {
+      <span class="alert-text">{{ alert.invocation.payloadToPlay }}</span>
+    }
   }
 </p>
 <audio #audio [src]="audioSource" autoplay></audio>

@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { SafeUrl } from '@angular/platform-browser';
-import { ParamMap, Router, RouterOutlet } from '@angular/router';
-import { BehaviorSubject, Observable, combineLatest, filter, map, startWith, switchMap, tap } from 'rxjs';
+import { ParamMap, Router } from '@angular/router';
+import { BehaviorSubject, Observable, combineLatest, filter, map, of, startWith, switchMap, take, tap } from 'rxjs';
 import { SoundboardService } from './soundboard.service';
 import { AsyncPipe } from '@angular/common';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -17,10 +17,16 @@ function hasAllRequiredParams(params: ParamMap): boolean {
   return params.has('channel') && params.has('token');
 }
 
+export interface VisualAlertInvocation {
+  invocation: SoundCommandInvocation;
+  payloadBlobUrl?: unknown;
+  blob?: Blob;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AsyncPipe, NgIconComponent],
+  imports: [AsyncPipe, NgIconComponent],
   providers: [
     provideIcons({
       heroExclamationTriangle
@@ -88,8 +94,22 @@ export class AppComponent implements OnInit {
     map(([connected, hasRequiredQueryParams]) => !connected || !hasRequiredQueryParams),
   );
 
-  public readonly visualAlert$ = this.soundboardService.soundCommandReceived.pipe(
+  public readonly visualAlert$: Observable<{ invocation: SoundCommandInvocation; payloadBlobUrl?: unknown, blob?: Blob }> = this.soundboardService.soundCommandReceived.pipe(
     filter(invocation => invocation.type === PayloadType.Visual),
+    switchMap((invocation) => {
+      if (invocation.payloadToPlay.startsWith('file://')) {
+        const fileName = invocation.payloadToPlay.substring('file://'.length);
+        return this.channelAndToken$.pipe(
+          take(1),
+          switchMap(({ channel, token }) => this.streamSourceService.getFile(channel, fileName, token)),
+          map((blob) => {
+            return { invocation, payloadBlobUrl: URL.createObjectURL(blob), blob };
+          })
+        );
+      } else {
+        return of({ invocation });
+      }
+    }),
     tap((invocation) => {
       LOG.info('Visual alert invoked:', invocation);
       this.showVisualAlert$.next(true);
