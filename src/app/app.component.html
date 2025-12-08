@@ -14,14 +14,16 @@
   </span>
 }
 
-<p [@visualAlert]="visualAlertVisible$ | async">
-  @if (visualAlert$ | async; as alert) {
+@if (visualAlert$ | async; as alert) {
+  <div [@visualAlert]="visualAlertVisible$ | async" [classList]="visualAlertClasses$ | async">
     <!-- <i>{{ alert.invokedAt }}</i> -->
-    @if (alert.payloadBlobUrl) {
-      <img class="alert-image" [src]="alert.payloadBlobUrl" alt="Visual Alert Image" />
+    @if (alert.visualAlert; as visualAlert) {
+      <img class="alert-image" [src]="visualAlert.image" alt="Visual Alert Image" />
+      <span class="alert-text">{{ visualAlert.text }}</span>
     } @else {
       <span class="alert-text">{{ alert.invocation.payloadToPlay }}</span>
     }
-  }
-</p>
+  </div>
+}
+
 <audio #audio [src]="audioSource" autoplay></audio>

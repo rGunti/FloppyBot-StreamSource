@@ -10,17 +10,12 @@ import { StreamSourceService } from './stream-source.service';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroExclamationTriangle } from '@ng-icons/heroicons/outline';
 import { Logger } from './utils/log';
+import { VisualAlertInvocation } from './stream-source.model';
 
 const LOG = Logger.create('AppComponent');
 
 function hasAllRequiredParams(params: ParamMap): boolean {
   return params.has('channel') && params.has('token');
-}
-
-export interface VisualAlertInvocation {
-  invocation: SoundCommandInvocation;
-  payloadBlobUrl?: unknown;
-  blob?: Blob;
 }
 
 @Component({
@@ -94,27 +89,37 @@ export class AppComponent implements OnInit {
     map(([connected, hasRequiredQueryParams]) => !connected || !hasRequiredQueryParams),
   );
 
-  public readonly visualAlert$: Observable<{ invocation: SoundCommandInvocation; payloadBlobUrl?: unknown, blob?: Blob }> = this.soundboardService.soundCommandReceived.pipe(
+  public readonly visualAlert$: Observable<VisualAlertInvocation> = this.soundboardService.soundCommandReceived.pipe(
     filter(invocation => invocation.type === PayloadType.Visual),
     switchMap((invocation) => {
       if (invocation.payloadToPlay.startsWith('file://')) {
-        const fileName = invocation.payloadToPlay.substring('file://'.length);
         return this.channelAndToken$.pipe(
           take(1),
-          switchMap(({ channel, token }) => this.streamSourceService.getFile(channel, fileName, token)),
-          map((blob) => {
-            return { invocation, payloadBlobUrl: URL.createObjectURL(blob), blob };
-          })
+          switchMap(({ channel, token }) => this.streamSourceService.parseVisualAlert(invocation, channel, token)),
         );
       } else {
         return of({ invocation });
       }
     }),
+    startWith({
+      invocation: {
+        commandName: '',
+        invokedFrom: '',
+        payloadToPlay: '',
+        type: PayloadType.Visual,
+      },
+      visualAlert: undefined,
+    } as VisualAlertInvocation),
     tap((invocation) => {
       LOG.info('Visual alert invoked:', invocation);
       this.showVisualAlert$.next(true);
-      setTimeout(() => this.showVisualAlert$.next(false), 5_000);
-    })
+      setTimeout(() => this.showVisualAlert$.next(false), invocation.visualAlert?.duration ?? 5_000);
+    }),
+  );
+  readonly visualAlertClasses$ = this.visualAlert$.pipe(
+    map((invocation) => invocation.visualAlert),
+    map((va) => va?.position.join('-') ?? 'center-center'),
+    map((positionClass) => `visual-alert-container grid-item-${positionClass}`),
   );
   public readonly visualAlertVisible$ = this.showVisualAlert$.asObservable().pipe(
     tap((show) => LOG.info('Visual alert visible:', show)),
