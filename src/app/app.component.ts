@@ -19,45 +19,33 @@ function hasAllRequiredParams(params: ParamMap): boolean {
 }
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [AsyncPipe, NgIconComponent],
-  providers: [
-    provideIcons({
-      heroExclamationTriangle
-    })
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  animations: [
-    trigger(
-      'inOutAnimation', 
-      [
-        transition(
-          ':enter', 
-          [
-            style({ opacity: 0 }),
-            animate('1s ease-out', 
-                    style({ opacity: 1 }))
-          ]
-        ),
-        transition(
-          ':leave', 
-          [
-            style({ opacity: 1 }),
-            animate('1s ease-in', 
-                    style({ opacity: 0 }))
-          ]
-        )
-      ]
-    ),
-    trigger('visualAlert', [
-      state('false', style({ opacity: 0 })),
-      state('true', style({ opacity: 1 })),
-      transition('false => true', animate('1000ms ease-in')),
-      transition('true => false', animate('1000ms ease-out'))
-    ])
-  ]
+    selector: 'app-root',
+    imports: [AsyncPipe, NgIconComponent],
+    providers: [
+        provideIcons({
+            heroExclamationTriangle
+        })
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
+    animations: [
+        trigger('inOutAnimation', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('1s ease-out', style({ opacity: 1 }))
+            ]),
+            transition(':leave', [
+                style({ opacity: 1 }),
+                animate('1s ease-in', style({ opacity: 0 }))
+            ])
+        ]),
+        trigger('visualAlert', [
+            state('false', style({ opacity: 0 })),
+            state('true', style({ opacity: 1 })),
+            transition('false => true', animate('1000ms ease-in')),
+            transition('true => false', animate('1000ms ease-out'))
+        ])
+    ]
 })
 export class AppComponent implements OnInit {
   private readonly router = inject(Router);
