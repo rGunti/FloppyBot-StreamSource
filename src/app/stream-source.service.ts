@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map, of } from 'rxjs';
@@ -37,13 +37,8 @@ const PROPERTY_PARSER: Partial<Record<keyof VisualAlertProperties | 'default', (
   providedIn: 'root'
 })
 export class StreamSourceService {
+  private readonly http = inject(HttpClient);
   private readonly apiServerUrl = `${environment.endpoint}/api/v2/stream-source`;
-
-  constructor(
-    private readonly http: HttpClient
-  ) {
-    LOG.ctor();
-  }
 
   getSoundCommands(channel: string): Observable<SoundCommandAbstract[]> {
     LOG.debug('getSoundCommands', channel);

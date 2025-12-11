@@ -15,34 +15,36 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^17.3.12",
-    "@angular/common": "^17.3.12",
-    "@angular/compiler": "^17.3.12",
-    "@angular/core": "^17.3.12",
-    "@angular/forms": "^17.3.12",
-    "@angular/platform-browser": "^17.3.12",
-    "@angular/platform-browser-dynamic": "^17.3.12",
-    "@angular/router": "^17.3.12",
+    "@angular/animations": "^21.0.4",
+    "@angular/common": "^21.0.4",
+    "@angular/compiler": "^21.0.4",
+    "@angular/core": "^21.0.4",
+    "@angular/forms": "^21.0.4",
+    "@angular/platform-browser": "^21.0.4",
+    "@angular/platform-browser-dynamic": "^21.0.4",
+    "@angular/router": "^21.0.4",
     "@microsoft/signalr": "^7.0.14",
     "@ng-icons/core": "^27.5.2",
     "@ng-icons/heroicons": "^27.5.2",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1",
-    "zone.js": "~0.14.10"
+    "zone.js": "~0.15.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.17",
-    "@angular-eslint/builder": "17.5.3",
-    "@angular-eslint/eslint-plugin": "17.5.3",
-    "@angular-eslint/eslint-plugin-template": "17.5.3",
-    "@angular-eslint/schematics": "17.5.3",
-    "@angular-eslint/template-parser": "17.5.3",
-    "@angular/cli": "^17.3.17",
-    "@angular/compiler-cli": "^17.3.12",
+    "@angular-eslint/builder": "21.1.0",
+    "@angular-eslint/eslint-plugin": "21.1.0",
+    "@angular-eslint/eslint-plugin-template": "21.1.0",
+    "@angular-eslint/schematics": "21.1.0",
+    "@angular-eslint/template-parser": "21.1.0",
+    "@angular/build": "^21.0.3",
+    "@angular/cli": "^21.0.3",
+    "@angular/compiler-cli": "^21.0.4",
     "@types/jasmine": "~5.1.13",
-    "@typescript-eslint/eslint-plugin": "7.18.0",
-    "@typescript-eslint/parser": "7.18.0",
-    "eslint": "^8.57.1",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.49.0",
+    "@typescript-eslint/type-utils": "^8.49.0",
+    "@typescript-eslint/utils": "^8.49.0",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
@@ -55,12 +57,23 @@
     "npm-run-all2": "^6.2.6",
     "prettier": "^3.7.4",
     "prettier-eslint": "^16.4.2",
-    "typescript": "~5.4.2"
+    "typescript": "~5.9.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
       "nice-napi"
-    ]
+    ],
+    "overrides": {
+      "ws@>=8.0.0 <8.17.1": ">=8.17.1",
+      "ws@>=7.0.0 <7.5.10": ">=7.5.10",
+      "body-parser@<1.20.3": ">=1.20.3",
+      "cookie@<0.7.0": ">=0.7.0",
+      "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5",
+      "brace-expansion@>=1.0.0 <=1.1.11": ">=1.1.12",
+      "brace-expansion@>=2.0.0 <=2.0.1": ">=2.0.2",
+      "tmp@<=0.2.3": ">=0.2.4",
+      "js-yaml@>=4.0.0 <4.1.1": ">=4.1.1"
+    }
   }
 }
