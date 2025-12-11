@@ -1,3 +1,5 @@
+@use "sass:list";
+
 :host {
     width: 100vw;
     height: 100vh;
@@ -11,10 +13,10 @@
 $vertical: top center bottom;
 $horizontal: left center right;
 
-@for $vi from 1 through length($vertical) {
-    $v: nth($vertical, $vi);
-    @for $hi from 1 through length($horizontal) {
-        $h: nth($horizontal, $hi);
+@for $vi from 1 through list.length($vertical) {
+    $v: list.nth($vertical, $vi);
+    @for $hi from 1 through list.length($horizontal) {
+        $h: list.nth($horizontal, $hi);
         .grid-item-#{$v}-#{$h} {
             grid-column: $hi;
             grid-row: $vi;
