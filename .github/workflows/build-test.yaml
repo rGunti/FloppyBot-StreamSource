@@ -13,10 +13,10 @@ jobs:
       matrix:
         node-version:
           # current LTS
-          - 20.x
+          - 22.x
         pnpm-version:
           # latest stable
-          - 9.x
+          - 10.x
 
     steps:
       # Checkout the repository
@@ -68,8 +68,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
-          category: '/language:typescript'
-
+          category: "/language:typescript"
 #  test:
 #    name: Test Application
 #    runs-on: ubuntu-latest
