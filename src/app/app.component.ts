@@ -19,7 +19,7 @@ function hasAllRequiredParams(params: ParamMap): boolean {
 }
 
 @Component({
-    selector: 'app-root',
+    selector: 'flpy-root',
     imports: [AsyncPipe, NgIconComponent],
     providers: [
         provideIcons({

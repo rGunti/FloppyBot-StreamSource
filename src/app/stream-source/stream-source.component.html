@@ -1,0 +1,29 @@
+<!-- Row 1 -->
+<div class="visual-alert-container top left" [animate.enter]="'enter-animation'">top left</div>
+<div class="visual-alert-container top center">top center</div>
+<div class="visual-alert-container top right">top right</div>
+
+<!-- Row 2 -->
+<div class="visual-alert-container center left">center left</div>
+<div class="visual-alert-container center center">center center</div>
+<div class="visual-alert-container center right">center right</div>
+
+<!-- Row 3 -->
+<div class="visual-alert-container bottom left">bottom left</div>
+<div class="visual-alert-container bottom center">bottom center</div>
+<div class="visual-alert-container bottom right">bottom right</div>
+
+<!-- Overlay -->
+@if (status$ | async; as status) {
+  @if (!status.isConnected) {
+    <div class="overlay-alert">
+      <ng-icon name="heroExclamationTriangle"></ng-icon>
+      <p>Connection to server failed! Stream Alerts not operational!</p>
+    </div>
+  }
+}
+
+<!-- Hidden Block -->
+<div class="system">
+  <audio #audio [src]="audioSource$ | async" autoplay></audio>
+</div>
