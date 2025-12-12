@@ -10,7 +10,25 @@ import {
   PayloadType,
 } from '../api';
 import { Logger } from '../utils/log';
-import { combineLatest, distinctUntilChanged, filter, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  concatMap,
+  defer,
+  distinctUntilChanged,
+  EMPTY,
+  filter,
+  finalize,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+  timer,
+} from 'rxjs';
 import { Router } from '@angular/router';
 import { SafeUrl } from '@angular/platform-browser';
 
@@ -40,6 +58,13 @@ const PROPERTY_PARSER: Partial<Record<AlertProperty | 'default', (value: string)
   default: (value: string) => value,
 };
 
+interface ChannelAndToken {
+  channel: string;
+  token: string;
+}
+
+declare type ExtendedCommandInvocation = CommandInvocation & ChannelAndToken;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -51,7 +76,7 @@ export class StreamSourceService {
   private readonly webSocket = inject(FloppyBotWebSocketService);
 
   private readonly queryParams$ = this.router.routerState.root.queryParamMap;
-  private readonly channelAndToken$ = this.queryParams$.pipe(
+  private readonly channelAndToken$: Observable<ChannelAndToken> = this.queryParams$.pipe(
     filter((params) => params.has('channel') && params.has('token')),
     map((params) => ({
       channel: params.get('channel')!,
@@ -59,8 +84,18 @@ export class StreamSourceService {
     })),
   );
 
+  private readonly activeAlertSubject = new BehaviorSubject<AlertInvocation | null>(null);
+  readonly activeAlert$ = this.activeAlertSubject.asObservable();
+
+  private readonly busySubject = new BehaviorSubject<boolean>(false);
+  readonly busy$ = this.busySubject.asObservable();
+
+  readonly isRunningInObs: boolean;
+
   constructor() {
     LOG.ctor();
+
+    this.isRunningInObs = navigator.userAgent.includes(' OBS/');
 
     this.webSocket.isConnected$
       .pipe(
@@ -73,36 +108,23 @@ export class StreamSourceService {
         }),
       )
       .subscribe();
+
+    combineLatest([this.webSocket.commandReceived$, this.channelAndToken$])
+      .pipe(
+        tap(() => this.busySubject.next(true)),
+        map(([cmd, channelAndToken]) => ({ ...cmd, ...channelAndToken })),
+        concatMap((invocation) =>
+          this.processCommand(invocation).pipe(
+            catchError((err) => {
+              LOG.error('Failed to process command', invocation, err);
+              return EMPTY;
+            }),
+          ),
+        ),
+        finalize(() => this.busySubject.next(false)),
+      )
+      .subscribe();
   }
-
-  readonly commandReceived$ = combineLatest([this.webSocket.commandReceived$, this.channelAndToken$]).pipe(
-    map(([invocation, channelAndToken]) => ({
-      invocation,
-      ...channelAndToken,
-    })),
-  );
-
-  readonly invokedSound$ = this.commandReceived$.pipe(
-    filter((x) => x.invocation.type === PayloadType.Sound),
-    switchMap((x) => {
-      const file = x.invocation.payloadToPlay;
-      if (this.soundCache.has(file)) {
-        LOG.debug('Already knowing this file, getting it from cache', file);
-        return of(this.soundCache.get(file));
-      }
-      return this.api.getFile(x.channel, file, x.token).pipe(
-        map((blob) => URL.createObjectURL(blob)),
-        tap((url) => this.soundCache.set(file, url)),
-      );
-    }),
-    shareReplay(1),
-  );
-
-  readonly invokedVisual$ = this.commandReceived$.pipe(
-    filter((x) => x.invocation.type === PayloadType.Visual),
-    switchMap((x) => this.parseVisualAlert(x.invocation, x.channel, x.token)),
-    shareReplay(1),
-  );
 
   readonly connectionState$ = combineLatest([this.webSocket.isConnected$, this.webSocket.status$]).pipe(
     map(([isConnected, status]) => ({ isConnected, status })),
@@ -112,22 +134,92 @@ export class StreamSourceService {
     LOG.onInit();
   }
 
-  private parseVisualAlert(
-    invocation: CommandInvocation,
-    channel: string,
-    apiKey: string,
-  ): Observable<AlertInvocation> {
+  private processCommand(cmd: ExtendedCommandInvocation): Observable<void> {
+    switch (cmd.type) {
+      case PayloadType.Sound:
+        return this.playSound(cmd);
+      case PayloadType.Visual:
+        return this.showVisualAlert(cmd);
+      default:
+        return of(void 0);
+    }
+  }
+
+  private playSound(cmd: ExtendedCommandInvocation): Observable<void> {
+    return defer(() =>
+      of(cmd).pipe(
+        switchMap((x) => {
+          const file = x.payloadToPlay;
+          if (this.soundCache.has(file)) {
+            LOG.info('Already knowing this file, getting it from cache', file);
+            return of(this.soundCache.get(file));
+          }
+
+          LOG.info('Getting file from server', file);
+          return this.api.getFile(x.channel, file, x.token).pipe(
+            map((blob) => URL.createObjectURL(blob)),
+            tap((url) => this.soundCache.set(file, url)),
+          );
+        }),
+        switchMap((safeUrl) => {
+          LOG.debug('Start playing file', safeUrl);
+          const audio = new Audio(safeUrl as string);
+          audio.preload = 'auto';
+          return new Promise<void>((resolve, reject) => {
+            const cleanup = () => {
+              LOG.debug('Cleaning up', safeUrl);
+              audio.onended = null;
+              audio.onerror = null;
+            };
+
+            audio.onended = () => {
+              LOG.debug('Audio playback ended for', safeUrl);
+              cleanup();
+              resolve();
+            };
+            audio.onerror = () => {
+              LOG.debug('Audio playback failed for', safeUrl);
+              cleanup();
+              reject(new Error('Audio playback failed'));
+            };
+
+            audio.play().catch((e) => {
+              LOG.debug('Audio playback failed for', safeUrl, e);
+              cleanup();
+              reject(e);
+            });
+          });
+        }),
+        map(() => void 0),
+      ),
+    );
+  }
+
+  private showVisualAlert(cmd: ExtendedCommandInvocation): Observable<void> {
+    return defer(() => {
+      return this.parseVisualAlert(cmd).pipe(
+        tap((alert) => this.activeAlertSubject.next(alert)),
+        tap((alert) => LOG.debug('Start playing alert', alert)),
+        switchMap((alert) => timer(alert.properties?.duration ?? 5_000).pipe(map(() => alert))),
+        tap((alert) => LOG.debug('Alert finished playing', alert)),
+        tap(() => this.activeAlertSubject.next(null)),
+        map(() => void 0),
+      );
+    });
+  }
+
+  private parseVisualAlert(invocation: ExtendedCommandInvocation): Observable<AlertInvocation> {
     const payload = invocation.payloadToPlay;
     if (!payload.startsWith('file://')) {
       return of({ invocation });
     }
 
     const parsed = this.parseVisualAlertPayload(payload);
-    return this.api.getFile(channel, parsed.image as string, apiKey).pipe(
+    return this.api.getFile(invocation.channel, parsed.image as string, invocation.token).pipe(
       map((blob) => ({
         invocation,
         blob,
-        payloadBlobUrl: this.api.getFileUrl(channel, parsed.image as string, apiKey),
+        payloadBlobUrl: this.api.getFileUrl(invocation.channel, parsed.image as string, invocation.token),
         visualAlert: {
           ...parsed,
           image: URL.createObjectURL(blob),

@@ -1,11 +1,33 @@
 import { Injectable } from '@angular/core';
 import { Logger } from '../utils/log';
-import { HubConnectionBuilder } from '@microsoft/signalr';
+import { HubConnectionBuilder, ILogger, LogLevel } from '@microsoft/signalr';
 import { environment } from '../../environments/environment';
 import { Subject } from 'rxjs';
 import { CommandInvocation, StreamSourceLoginArgs } from './entities';
 
 const LOG = Logger.create('FloppyBotWebSocketService');
+
+class SignalRLogger implements ILogger {
+  private readonly logger = Logger.create('SignalR');
+
+  log(logLevel: LogLevel, message: string): void {
+    switch (logLevel) {
+      case LogLevel.Trace:
+      case LogLevel.Debug:
+        return this.logger.debug(message);
+      case LogLevel.Information:
+        return this.logger.info(message);
+      case LogLevel.Warning:
+        return this.logger.warn(message);
+      case LogLevel.Error:
+      case LogLevel.Critical:
+        return this.logger.error(message);
+      case LogLevel.None:
+      default:
+        break;
+    }
+  }
+}
 
 @Injectable({
   providedIn: 'root',
@@ -14,10 +36,11 @@ export class FloppyBotWebSocketService {
   private readonly hub = new HubConnectionBuilder()
     .withUrl(`${environment.endpoint}/hub/stream-source`)
     .withAutomaticReconnect({
-      nextRetryDelayInMilliseconds: () => 5000
+      nextRetryDelayInMilliseconds: () => 5000,
     })
+    .configureLogging(new SignalRLogger())
     .build();
-  
+
   constructor() {
     LOG.ctor();
 
@@ -28,7 +51,8 @@ export class FloppyBotWebSocketService {
 
     setTimeout(() => {
       LOG.info('Initiating connection ...');
-      this.hub.start()
+      this.hub
+        .start()
         .then(() => {
           LOG.info('Connected to server');
           this.statusSubject.next(`Connected`);
@@ -82,7 +106,7 @@ export class FloppyBotWebSocketService {
   }
 
   private onCommandReceived(command: CommandInvocation) {
-    LOG.info('Received sound command', command);
+    LOG.info('Received command invocation', command);
     this.statusSubject.next(`${command.invokedBy} invoked command ${command.commandName}`);
     this.commandReceivedSubject.next(command);
   }

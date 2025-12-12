@@ -71,8 +71,8 @@ export class Logger {
   }
 
   // *** Aliases ***
-  ctor(): void {
-    logDebug(this.source, 'ctor');
+  ctor(...args: unknown[]): void {
+    logDebug(this.source, 'ctor', ...args);
   }
 
   onInit(): void {

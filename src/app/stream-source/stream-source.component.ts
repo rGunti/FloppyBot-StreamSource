@@ -21,21 +21,11 @@ const LOG = Logger.create('StreamSourceComponent');
 export class StreamSourceComponent implements OnInit {
   private readonly streamSource = inject(StreamSourceService);
 
-  @ViewChild('audio') private audioElementRef: ElementRef<HTMLAudioElement> = null!;
-
   readonly status$ = this.streamSource.connectionState$;
-  readonly audioSource$ = this.streamSource.invokedSound$;
+  readonly isRunningInObs = this.streamSource.isRunningInObs;
 
   ngOnInit(): void {
     LOG.onInit();
     this.streamSource.init();
-
-    this.audioSource$.subscribe(() => {
-      this.audioElementRef.nativeElement.pause();
-      this.audioElementRef.nativeElement.currentTime = 0;
-      setTimeout(() => {
-        this.audioElementRef.nativeElement.play();
-      });
-    });
   }
 }
