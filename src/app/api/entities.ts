@@ -40,5 +40,7 @@ export interface AlertProperties {
   duration: number;
   text: string;
   font: string;
+  color: string;
+  borderColor: string;
   audio?: SafeUrl | string;
 }

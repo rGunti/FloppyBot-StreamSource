@@ -1,15 +1,10 @@
 @if (currentAlert$ | async; as alert) {
-  <div
-    [classList]="alert.classes"
-    [style]="alert.styles"
-    [animate.enter]="'enter-animation'"
-    [animate.exit]="'exit-animation'"
-  >
+  <div [classList]="alert.classes" [animate.enter]="'enter-animation'" [animate.exit]="'exit-animation'">
     @if (alert.properties; as alertProperties) {
       <img class="alert-image" [src]="alertProperties.image" alt="Visual Alert Image" />
-      <span class="alert-text">{{ alertProperties.text }}</span>
+      <span class="alert-text" [style]="alert.styles">{{ alertProperties.text }}</span>
     } @else {
-      <span class="alert-text">{{ alert.invocation.payloadToPlay }}</span>
+      <span class="alert-text" [style]="alert.styles">{{ alert.invocation.payloadToPlay }}</span>
     }
   </div>
 }

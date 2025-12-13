@@ -271,6 +271,8 @@ export class StreamSourceService {
       position: ['center', 'center'],
       duration: 5_000,
       text: '',
+      color: 'green',
+      borderColor: 'black',
       font: 'Poppins',
     };
     return split
