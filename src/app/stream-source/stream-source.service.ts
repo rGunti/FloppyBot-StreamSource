@@ -69,7 +69,7 @@ declare type ExtendedCommandInvocation = CommandInvocation & ChannelAndToken;
   providedIn: 'root',
 })
 export class StreamSourceService {
-  private readonly soundCache = new Map<string, SafeUrl>();
+  private readonly cache = new Map<string, SafeUrl>();
 
   private readonly api = inject(FloppyBotApiService);
   private readonly router = inject(Router);
@@ -145,22 +145,26 @@ export class StreamSourceService {
     }
   }
 
+  private getFile(fileName: string, channel: string, token: string): Observable<SafeUrl> {
+    if (this.cache.has(fileName)) {
+      LOG.info('Already knowing this file, getting it from cache', fileName);
+      return of(this.cache.get(fileName)!);
+    }
+
+    LOG.info('Getting file from server', fileName);
+    return this.api.getFile(channel, fileName, token).pipe(
+      map((blob) => URL.createObjectURL(blob)),
+      tap((url) => {
+        LOG.info('Caching file', fileName, url);
+        this.cache.set(fileName, url);
+      }),
+    );
+  }
+
   private playSound(cmd: ExtendedCommandInvocation): Observable<void> {
     return defer(() =>
       of(cmd).pipe(
-        switchMap((x) => {
-          const file = x.payloadToPlay;
-          if (this.soundCache.has(file)) {
-            LOG.info('Already knowing this file, getting it from cache', file);
-            return of(this.soundCache.get(file));
-          }
-
-          LOG.info('Getting file from server', file);
-          return this.api.getFile(x.channel, file, x.token).pipe(
-            map((blob) => URL.createObjectURL(blob)),
-            tap((url) => this.soundCache.set(file, url)),
-          );
-        }),
+        switchMap((x) => this.getFile(x.payloadToPlay, x.channel, x.token)),
         switchMap((safeUrl) => {
           LOG.debug('Start playing file', safeUrl);
           const audio = new Audio(safeUrl as string);
@@ -215,28 +219,17 @@ export class StreamSourceService {
     }
 
     const parsed = this.parseVisualAlertPayload(payload);
-    return this.api.getFile(invocation.channel, parsed.image as string, invocation.token).pipe(
-      map((blob) => {
+    return this.getFile(parsed.image as string, invocation.channel, invocation.token).pipe(
+      map((url) => {
         const alertInvocation: AlertInvocation = {
           invocation,
           properties: {
             ...parsed,
-            image: URL.createObjectURL(blob),
-            imageBlob: blob,
+            image: url,
           },
         };
         return alertInvocation;
       }),
-      // map((blob) => ({
-      //   invocation,
-      //   blob,
-      //   payloadBlobUrl: this.api.getFileUrl(invocation.channel, parsed.image as string, invocation.token),
-      //   visualAlert: {
-      //     ...parsed,
-      //     image: URL.createObjectURL(blob),
-      //     imageBlob: blob,
-      //   },
-      // })),
     );
   }
 
@@ -245,7 +238,6 @@ export class StreamSourceService {
     const fileName = split[0].substring('file://'.length);
     const defaultProperties: AlertProperties = {
       image: fileName,
-      imageBlob: null,
       position: ['center', 'center'],
       duration: 5_000,
       text: '',
