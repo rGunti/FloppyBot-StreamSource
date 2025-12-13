@@ -1,14 +1,25 @@
-<!-- Row 1 -->
-<div class="visual-alert-container top left" [animate.enter]="'enter-animation'">top left</div>
+@if (currentAlert$ | async; as alert) {
+  <div [classList]="alert.classes" [animate.enter]="'enter-animation'" [animate.exit]="'exit-animation'">
+    @if (alert.properties; as alertProperties) {
+      <img class="alert-image" [src]="alertProperties.image" alt="Visual Alert Image" />
+      <span class="alert-text">{{ alertProperties.text }}</span>
+    } @else {
+      <span class="alert-text">{{ alert.invocation.payloadToPlay }}</span>
+    }
+  </div>
+}
+
+<!-- Row 1 --
+<div class="visual-alert-container top left">top left</div>
 <div class="visual-alert-container top center">top center</div>
 <div class="visual-alert-container top right">top right</div>
 
-<!-- Row 2 -->
+<!-- Row 2 --
 <div class="visual-alert-container center left">center left</div>
 <div class="visual-alert-container center center">center center</div>
 <div class="visual-alert-container center right">center right</div>
 
-<!-- Row 3 -->
+<!-- Row 3 --
 <div class="visual-alert-container bottom left">bottom left</div>
 <div class="visual-alert-container bottom center">bottom center</div>
 <div class="visual-alert-container bottom right">bottom right</div>

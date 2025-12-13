@@ -17,7 +17,7 @@ $horizontal: left center right;
   $v: list.nth($vertical, $vi);
   @for $hi from 1 through list.length($horizontal) {
     $h: list.nth($horizontal, $hi);
-    .grid-item-#{$v}-#{$h} {
+    .#{$v}.#{$h} {
       grid-column: $hi;
       grid-row: $vi;
     }
@@ -75,11 +75,11 @@ $horizontal: left center right;
 
     font-size: 2em;
     font-weight: bold;
-    text-shadow:
-      -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-      1px 1px 0 #000;
+    // text-shadow:
+    //   -1px -1px 0 #000,
+    //   1px -1px 0 #000,
+    //   -1px 1px 0 #000,
+    //   1px 1px 0 #000;
   }
 }
 
@@ -87,8 +87,13 @@ $horizontal: left center right;
   display: none;
 }
 
-.enter-animation {
+.enter-animation,
+.exit-animation {
   animation: slide-fade 1s;
+
+  &.exit-animation {
+    animation-direction: reverse;
+  }
 }
 
 @keyframes slide-fade {

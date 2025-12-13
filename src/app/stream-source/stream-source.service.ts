@@ -216,16 +216,27 @@ export class StreamSourceService {
 
     const parsed = this.parseVisualAlertPayload(payload);
     return this.api.getFile(invocation.channel, parsed.image as string, invocation.token).pipe(
-      map((blob) => ({
-        invocation,
-        blob,
-        payloadBlobUrl: this.api.getFileUrl(invocation.channel, parsed.image as string, invocation.token),
-        visualAlert: {
-          ...parsed,
-          image: URL.createObjectURL(blob),
-          imageBlob: blob,
-        },
-      })),
+      map((blob) => {
+        const alertInvocation: AlertInvocation = {
+          invocation,
+          properties: {
+            ...parsed,
+            image: URL.createObjectURL(blob),
+            imageBlob: blob,
+          },
+        };
+        return alertInvocation;
+      }),
+      // map((blob) => ({
+      //   invocation,
+      //   blob,
+      //   payloadBlobUrl: this.api.getFileUrl(invocation.channel, parsed.image as string, invocation.token),
+      //   visualAlert: {
+      //     ...parsed,
+      //     image: URL.createObjectURL(blob),
+      //     imageBlob: blob,
+      //   },
+      // })),
     );
   }
 
