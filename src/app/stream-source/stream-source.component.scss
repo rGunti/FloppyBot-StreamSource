@@ -1,0 +1,119 @@
+@use 'sass:list';
+
+:host {
+  width: 100vw;
+  height: 100vh;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+}
+
+$vertical: top center bottom;
+$horizontal: left center right;
+
+@for $vi from 1 through list.length($vertical) {
+  $v: list.nth($vertical, $vi);
+  @for $hi from 1 through list.length($horizontal) {
+    $h: list.nth($horizontal, $hi);
+    .#{$v}.#{$h} {
+      grid-column: $hi;
+      grid-row: $vi;
+    }
+  }
+}
+
+.overlay-alert {
+  position: absolute;
+  // top: calc(50vh - 100px);
+  // left: calc(50vw - 150px);
+  top: 20px;
+  right: 20px;
+
+  width: 600px;
+  // height: 100px;
+
+  border: 3px solid black;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 5px;
+
+  animation: system-alert-fade 1s;
+
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  // justify-content: center;
+
+  & > ng-icon {
+    flex: 0 1 auto;
+    font-size: 5em;
+  }
+  & > * {
+    flex: 1;
+  }
+  & > p {
+    margin: 0;
+  }
+}
+
+@media (width <= 625px) {
+  .overlay-alert {
+    width: 80vw;
+  }
+}
+
+.visual-alert-container {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+
+  .alert-text {
+    text-align: center;
+
+    font-size: 2em;
+    font-weight: bold;
+    // text-shadow:
+    //   -1px -1px 0 #000,
+    //   1px -1px 0 #000,
+    //   -1px 1px 0 #000,
+    //   1px 1px 0 #000;
+  }
+}
+
+.system {
+  display: none;
+}
+
+.enter-animation,
+.exit-animation {
+  animation: slide-fade 1s;
+
+  &.exit-animation {
+    animation-direction: reverse;
+  }
+}
+
+@keyframes slide-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes system-alert-fade {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
