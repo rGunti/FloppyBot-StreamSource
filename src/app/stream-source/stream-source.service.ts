@@ -242,6 +242,7 @@ export class StreamSourceService {
       position: ['center', 'center'],
       duration: 5_000,
       text: '',
+      font: 'Poppins',
     };
     return split
       .slice(1)

@@ -39,4 +39,5 @@ export interface AlertProperties {
   position: VisualAlertPosition;
   duration: number;
   text: string;
+  font: string;
 }

@@ -34,6 +34,9 @@ export class StreamSourceComponent implements OnInit {
       return {
         ...alert,
         classes: `visual-alert-container ${(alert.properties?.position ?? []).join(' ')}`,
+        styles: {
+          'font-family': alert.properties?.font ?? undefined,
+        },
       };
     }),
   );
