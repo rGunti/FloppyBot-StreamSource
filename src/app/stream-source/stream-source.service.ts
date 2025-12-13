@@ -20,12 +20,11 @@ import {
   EMPTY,
   filter,
   finalize,
+  forkJoin,
   map,
   Observable,
   of,
-  shareReplay,
   switchMap,
-  take,
   tap,
   timer,
 } from 'rxjs';
@@ -166,38 +165,40 @@ export class StreamSourceService {
     return defer(() =>
       of(cmd).pipe(
         switchMap((x) => this.getFile(x.payloadToPlay, x.channel, x.token)),
-        switchMap((safeUrl) => {
-          LOG.debug('Start playing file', safeUrl);
-          const audio = new Audio(safeUrl as string);
-          audio.preload = 'auto';
-          return new Promise<void>((resolve, reject) => {
-            const cleanup = () => {
-              LOG.debug('Cleaning up', safeUrl);
-              audio.onended = null;
-              audio.onerror = null;
-            };
-
-            audio.onended = () => {
-              LOG.debug('Audio playback ended for', safeUrl);
-              cleanup();
-              resolve();
-            };
-            audio.onerror = () => {
-              LOG.debug('Audio playback failed for', safeUrl);
-              cleanup();
-              reject(new Error('Audio playback failed'));
-            };
-
-            audio.play().catch((e) => {
-              LOG.debug('Audio playback failed for', safeUrl, e);
-              cleanup();
-              reject(e);
-            });
-          });
-        }),
+        switchMap((safeUrl) => this.playSoundFromUrl(safeUrl)),
         map(() => void 0),
       ),
     );
+  }
+
+  private playSoundFromUrl(safeUrl: SafeUrl): Promise<void> {
+    LOG.debug('Start playing file', safeUrl);
+    const audio = new Audio(safeUrl as string);
+    audio.preload = 'auto';
+    return new Promise<void>((resolve, reject) => {
+      const cleanup = () => {
+        LOG.debug('Cleaning up', safeUrl);
+        audio.onended = null;
+        audio.onerror = null;
+      };
+
+      audio.onended = () => {
+        LOG.debug('Audio playback ended for', safeUrl);
+        cleanup();
+        resolve();
+      };
+      audio.onerror = () => {
+        LOG.debug('Audio playback failed for', safeUrl);
+        cleanup();
+        reject(new Error('Audio playback failed'));
+      };
+
+      audio.play().catch((e) => {
+        LOG.debug('Audio playback failed for', safeUrl, e);
+        cleanup();
+        reject(e);
+      });
+    });
   }
 
   private showVisualAlert(cmd: ExtendedCommandInvocation): Observable<void> {
@@ -205,7 +206,15 @@ export class StreamSourceService {
       return this.parseVisualAlert(cmd).pipe(
         tap((alert) => this.activeAlertSubject.next(alert)),
         tap((alert) => LOG.debug('Start playing alert', alert)),
-        switchMap((alert) => timer(alert.properties?.duration ?? 5_000).pipe(map(() => alert))),
+        switchMap((alert) =>
+          forkJoin([
+            timer(alert.properties?.duration ?? 5_000),
+            of(alert.properties?.audio).pipe(
+              filter((audioUrl) => !!audioUrl),
+              switchMap((audioUrl) => this.playSoundFromUrl(audioUrl!)),
+            ),
+          ]).pipe(map(() => alert)),
+        ),
         tap((alert) => LOG.debug('Alert finished playing', alert)),
         tap(() => this.activeAlertSubject.next(null)),
         map(() => void 0),
@@ -222,14 +231,34 @@ export class StreamSourceService {
     const parsed = this.parseVisualAlertPayload(payload);
     return this.getFile(parsed.image as string, invocation.channel, invocation.token).pipe(
       map((url) => {
-        const alertInvocation: AlertInvocation = {
+        const alertInvocation: AlertInvocation & ChannelAndToken = {
           invocation,
           properties: {
             ...parsed,
             image: url,
           },
+          channel: invocation.channel,
+          token: invocation.token,
         };
         return alertInvocation;
+      }),
+      switchMap((alertInvocation) => {
+        const audioFile = alertInvocation.properties?.audio;
+        if (!audioFile) {
+          return of(alertInvocation as AlertInvocation);
+        }
+
+        return this.getFile(audioFile as string, alertInvocation.channel, alertInvocation.token).pipe(
+          map((audioUrl) => ({
+            ...alertInvocation,
+            properties: alertInvocation.properties
+              ? {
+                  ...alertInvocation.properties,
+                  audio: audioUrl,
+                }
+              : undefined,
+          })),
+        );
       }),
     );
   }
