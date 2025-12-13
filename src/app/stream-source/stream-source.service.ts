@@ -115,6 +115,7 @@ export class StreamSourceService {
         map(([cmd, channelAndToken]) => ({ ...cmd, ...channelAndToken })),
         concatMap((invocation) =>
           this.processCommand(invocation).pipe(
+            concatMap(() => timer(1_000)),
             catchError((err) => {
               LOG.error('Failed to process command', invocation, err);
               return EMPTY;
