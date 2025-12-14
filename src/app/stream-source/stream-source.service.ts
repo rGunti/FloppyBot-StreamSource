@@ -155,7 +155,7 @@ export class StreamSourceService {
       .pipe(
         filter((cmd) => cmd.type === PayloadType.Command),
         tap((cmd) => {
-          switch (cmd.payloadToPlay) {
+          switch (cmd.commandName) {
             case 'skip':
               this.skipCurrentAlert();
               break;
