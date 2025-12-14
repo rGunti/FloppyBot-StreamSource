@@ -1,5 +1,6 @@
 @if (currentAlert$ | async; as alert) {
   <div
+    [aria-hidden]="true"
     [classList]="alert.classes"
     [animate.enter]="'enter-animation'"
     [animate.exit]="'exit-animation'"

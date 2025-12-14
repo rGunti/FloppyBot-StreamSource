@@ -238,6 +238,7 @@ export class StreamSourceService {
         if (!completed) {
           sub.next();
           sub.complete();
+          completed = true;
         }
       };
 
