@@ -1,5 +1,11 @@
 @if (currentAlert$ | async; as alert) {
-  <div [classList]="alert.classes" [animate.enter]="'enter-animation'" [animate.exit]="'exit-animation'">
+  <div
+    [aria-hidden]="true"
+    [classList]="alert.classes"
+    [animate.enter]="'enter-animation'"
+    [animate.exit]="'exit-animation'"
+    (click)="skipAlert()"
+  >
     @if (alert.properties; as alertProperties) {
       <img class="alert-image" [src]="alertProperties.image" alt="Visual Alert Image" />
       <span class="alert-text" [style]="alert.styles">{{ alertProperties.text }}</span>
@@ -9,21 +15,6 @@
   </div>
 }
 
-<!-- Row 1 --
-<div class="visual-alert-container top left">top left</div>
-<div class="visual-alert-container top center">top center</div>
-<div class="visual-alert-container top right">top right</div>
-
-<!-- Row 2 --
-<div class="visual-alert-container center left">center left</div>
-<div class="visual-alert-container center center">center center</div>
-<div class="visual-alert-container center right">center right</div>
-
-<!-- Row 3 --
-<div class="visual-alert-container bottom left">bottom left</div>
-<div class="visual-alert-container bottom center">bottom center</div>
-<div class="visual-alert-container bottom right">bottom right</div>
-
 <!-- Overlay -->
 @if (status$ | async; as status) {
   @if (!status.isConnected) {
@@ -32,4 +23,9 @@
       <p>Connection to server failed! Stream Alerts not operational!</p>
     </div>
   }
+} @else if ((isConfigured$ | async) === false) {
+  <div class="overlay-alert">
+    <ng-icon name="heroExclamationTriangle"></ng-icon>
+    <p>No Channel or Token provided! Stream Alerts not operational!</p>
+  </div>
 }

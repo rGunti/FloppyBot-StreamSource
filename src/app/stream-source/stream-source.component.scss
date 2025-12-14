@@ -17,7 +17,7 @@ $horizontal: left center right;
   $v: list.nth($vertical, $vi);
   @for $hi from 1 through list.length($horizontal) {
     $h: list.nth($horizontal, $hi);
-    .#{$v}.#{$h} {
+    .#{$v}-#{$h} {
       grid-column: $hi;
       grid-row: $vi;
     }
