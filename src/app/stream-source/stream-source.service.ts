@@ -83,6 +83,10 @@ export class StreamSourceService {
     })),
   );
 
+  readonly hasChannelAndToken$: Observable<boolean> = this.queryParams$.pipe(
+    map((params) => params.has('channel') && params.has('token')),
+  );
+
   private readonly activeAlertSubject = new BehaviorSubject<AlertInvocation | null>(null);
   readonly activeAlert$ = this.activeAlertSubject.asObservable();
 

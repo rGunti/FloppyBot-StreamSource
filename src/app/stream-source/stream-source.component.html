@@ -32,4 +32,9 @@
       <p>Connection to server failed! Stream Alerts not operational!</p>
     </div>
   }
+} @else if ((isConfigured$ | async) === false) {
+  <div class="overlay-alert">
+    <ng-icon name="heroExclamationTriangle"></ng-icon>
+    <p>No Channel or Token provided! Stream Alerts not operational!</p>
+  </div>
 }

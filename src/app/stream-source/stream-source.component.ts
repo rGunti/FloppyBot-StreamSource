@@ -22,6 +22,7 @@ const LOG = Logger.create('StreamSourceComponent');
 export class StreamSourceComponent implements OnInit {
   private readonly streamSource = inject(StreamSourceService);
 
+  readonly isConfigured$ = this.streamSource.hasChannelAndToken$;
   readonly status$ = this.streamSource.connectionState$;
   readonly isRunningInObs = this.streamSource.isRunningInObs;
 
