@@ -10,6 +10,7 @@ export interface SoundCommandAbstract {
 export enum PayloadType {
   Sound = 0,
   Visual = 1,
+  Command = 0xff,
 }
 
 export interface CommandInvocation {

@@ -34,7 +34,7 @@ export class StreamSourceComponent implements OnInit {
 
       return {
         ...alert,
-        classes: `visual-alert-container ${(alert.properties?.position ?? []).join(' ')}`,
+        classes: `visual-alert-container ${(alert.properties?.position ?? []).join('-')}`,
         styles: {
           'font-family': alert.properties?.font,
           color: alert.properties?.color,
@@ -49,5 +49,9 @@ export class StreamSourceComponent implements OnInit {
   ngOnInit(): void {
     LOG.onInit();
     this.streamSource.init();
+  }
+
+  skipAlert(): void {
+    this.streamSource.skipCurrentAlert();
   }
 }

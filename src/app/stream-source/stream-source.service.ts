@@ -24,7 +24,10 @@ import {
   map,
   Observable,
   of,
+  race,
+  Subject,
   switchMap,
+  take,
   tap,
   timer,
 } from 'rxjs';
@@ -93,6 +96,9 @@ export class StreamSourceService {
   private readonly busySubject = new BehaviorSubject<boolean>(false);
   readonly busy$ = this.busySubject.asObservable();
 
+  private readonly alertShortCircuitSubject = new Subject<void>();
+  readonly alertShortCircuit$ = this.alertShortCircuitSubject.asObservable();
+
   readonly isRunningInObs: boolean;
 
   constructor() {
@@ -112,20 +118,52 @@ export class StreamSourceService {
       )
       .subscribe();
 
-    combineLatest([this.webSocket.commandReceived$, this.channelAndToken$])
+    combineLatest([
+      this.webSocket.commandReceived$.pipe(filter((cmd) => cmd.type !== PayloadType.Command)),
+      this.channelAndToken$,
+    ])
       .pipe(
-        tap(() => this.busySubject.next(true)),
+        tap(() => {
+          LOG.debug('busySubject = true');
+          this.busySubject.next(true);
+        }),
         map(([cmd, channelAndToken]) => ({ ...cmd, ...channelAndToken })),
         concatMap((invocation) =>
-          this.processCommand(invocation).pipe(
+          race([
+            this.alertShortCircuit$.pipe(
+              take(1),
+              tap(() => LOG.debug('Alert short circuited')),
+              tap(() => this.activeAlertSubject.next(null)),
+            ),
+            this.processCommand(invocation).pipe(finalize(() => LOG.debug('processCommand() finalized'))),
+          ]).pipe(
+            tap(() => LOG.debug('race(alertShortCircuit$, processCommand) completed, waiting for a moment')),
             concatMap(() => timer(1_000)),
+            tap(() => LOG.debug('timer() completed')),
             catchError((err) => {
               LOG.error('Failed to process command', invocation, err);
               return EMPTY;
             }),
+            finalize(() => LOG.debug('race(alertShortCircuit$, processCommand) finalized')),
           ),
         ),
         finalize(() => this.busySubject.next(false)),
+      )
+      .subscribe();
+
+    this.webSocket.commandReceived$
+      .pipe(
+        filter((cmd) => cmd.type === PayloadType.Command),
+        tap((cmd) => {
+          switch (cmd.payloadToPlay) {
+            case 'skip':
+              this.skipCurrentAlert();
+              break;
+            default:
+              LOG.error('Invalid command received', cmd.payloadToPlay);
+              break;
+          }
+        }),
       )
       .subscribe();
   }
@@ -136,6 +174,11 @@ export class StreamSourceService {
 
   init(): void {
     LOG.onInit();
+  }
+
+  skipCurrentAlert(): void {
+    LOG.info('Skipping current alert');
+    this.alertShortCircuitSubject.next();
   }
 
   private processCommand(cmd: ExtendedCommandInvocation): Observable<void> {
@@ -170,37 +213,53 @@ export class StreamSourceService {
       of(cmd).pipe(
         switchMap((x) => this.getFile(x.payloadToPlay, x.channel, x.token)),
         switchMap((safeUrl) => this.playSoundFromUrl(safeUrl)),
+        tap(() => LOG.debug('Play sound completed')),
         map(() => void 0),
+        finalize(() => LOG.debug('playSound() finalized')),
       ),
     );
   }
 
-  private playSoundFromUrl(safeUrl: SafeUrl): Promise<void> {
+  private playSoundFromUrl(safeUrl: SafeUrl | undefined): Observable<void> {
     LOG.debug('Start playing file', safeUrl);
-    const audio = new Audio(safeUrl as string);
-    audio.preload = 'auto';
-    return new Promise<void>((resolve, reject) => {
-      const cleanup = () => {
-        LOG.debug('Cleaning up', safeUrl);
+    if (!safeUrl) {
+      return new Observable<void>((x) => x.complete());
+    }
+
+    return new Observable<void>((sub) => {
+      const audio = new Audio(safeUrl as string);
+      audio.preload = 'auto';
+
+      let completed = false;
+      const complete = () => {
+        audio.pause();
         audio.onended = null;
         audio.onerror = null;
+        if (!completed) {
+          sub.next();
+          sub.complete();
+        }
       };
+
+      sub.add(() => {
+        LOG.debug('Cleaning up', safeUrl);
+        complete();
+      });
 
       audio.onended = () => {
         LOG.debug('Audio playback ended for', safeUrl);
-        cleanup();
-        resolve();
+        complete();
       };
       audio.onerror = () => {
         LOG.debug('Audio playback failed for', safeUrl);
-        cleanup();
-        reject(new Error('Audio playback failed'));
+        sub.error(new Error('Audio playback failed'));
+        sub.complete();
       };
 
       audio.play().catch((e) => {
         LOG.debug('Audio playback failed for', safeUrl, e);
-        cleanup();
-        reject(e);
+        sub.error(e);
+        sub.complete();
       });
     });
   }
@@ -212,16 +271,20 @@ export class StreamSourceService {
         tap((alert) => LOG.debug('Start playing alert', alert)),
         switchMap((alert) =>
           forkJoin([
-            timer(alert.properties?.duration ?? 5_000),
+            timer(alert.properties?.duration ?? 5_000).pipe(tap(() => LOG.debug('Timer completed'))),
             of(alert.properties?.audio).pipe(
-              filter((audioUrl) => !!audioUrl),
-              switchMap((audioUrl) => this.playSoundFromUrl(audioUrl!)),
+              switchMap((audioUrl) => (audioUrl ? this.playSoundFromUrl(audioUrl!) : new Promise<void>((r) => r()))),
+              tap(() => LOG.debug('Audio playback completed')),
             ),
-          ]).pipe(map(() => alert)),
+          ]).pipe(
+            tap(() => LOG.debug('Alert completed')),
+            map(() => alert),
+          ),
         ),
         tap((alert) => LOG.debug('Alert finished playing', alert)),
         tap(() => this.activeAlertSubject.next(null)),
         map(() => void 0),
+        finalize(() => LOG.debug('showVisualAlert() finalized')),
       );
     });
   }
